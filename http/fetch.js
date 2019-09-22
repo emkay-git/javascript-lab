@@ -22,9 +22,6 @@ const sendHttpRequest = (method, url, data) => {
 
 
 
-
-
-
 const getRequest = () => {
     sendHttpRequest('GET', 'https://reqres.in/api/users').then((resolveData) => {
         console.log(resolveData);
