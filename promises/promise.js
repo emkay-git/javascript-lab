@@ -350,6 +350,33 @@ testTryCatch();
 /**************************************************************************************** */
 
 
+/**************************************************************************************** */
+
+/**
+ * Promise API
+ */
+
+/**
+ * This is like forkJoin where I want to run
+ * multiple promises in parallel and wait till 
+ * all of them are completed
+ */
+
+ const promise1 = new Promise((resolve) => {
+     resolve('Promise1');
+ });
+ const promise2 = new Promise((resolve) => {
+    resolve('Promise2');
+});
+const promise3 = new Promise((resolve,reject) => {
+    reject('Promise3');
+});
+
+ Promise.all([
+     promise1,
+     promise2,
+     promise3
+ ]).then((data) => console.log(data));
 
 
 
