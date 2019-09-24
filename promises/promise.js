@@ -436,8 +436,10 @@
 
 
 const dummyAsyncFunction = (data, callback) => {
-    if (data)
-        setTimeout(callback(null, 'I am success data'), 2000);
+    if (data) {
+        setTimeout(() => callback(null, 'I am success data'), 3000);
+        setTimeout(() => callback(null, 'SEcond'), 4000);
+    }
     else setTimeout((callback('error', 'I am a failed data'), 2000));
 }
 
@@ -453,7 +455,9 @@ const dummyAsyncFunction = (data, callback) => {
 
 /**Promisify dummyAsyncFunction */
 
-
+/**This returns a function which takes the arguements which f is supposed to take, just without the
+ * callback.
+ */
 promisify = (f) => {
     return (...args) => {
         return new Promise((resolve, reject) => {
@@ -462,7 +466,6 @@ promisify = (f) => {
                 resolve(data);
             };
             args.push(customCallBack)
-            console.log(this);
             f.call(this, ...args);
         })
     }
@@ -474,26 +477,12 @@ const dummyAsyncPromisified = promisify(dummyAsyncFunction);
 dummyAsyncPromisified(true).then((data) => console.log(data)).catch((err) => console.log(err));
 
 
-
-
-
-// function promisify(f) {
-//     return function (...args) { // return a wrapper-function
-//         return new Promise((resolve, reject) => {
-//             function callback(err, result) { // our custom callback for f
-//                 if (err) {
-//                     return reject(err);
-//                 } else {
-//                     resolve(result);
-//                 }
-//             }
-
-//             args.push(callback); // append our custom callback to the end of f arguments
-
-//             f.call(this, ...args); // call the original function
-//         });
-//     };
-// };
+/**
+ * ***************************************************************************************************
+ * Remember, a promise may have only one result, but a callback may technically be called many times.
+ * So promisification is only meant for functions that call the callback once. Further calls will be ignored.
+ * ***************************************************************************************************
+ */
 
 
 
@@ -537,6 +526,7 @@ dummyAsyncPromisified(true).then((data) => console.log(data)).catch((err) => con
  * 4) Write a general promisification method assuming callbacks are of type function(error,result).
  *
  *
+ * Source: - https://javascript.info
  */
 
 
