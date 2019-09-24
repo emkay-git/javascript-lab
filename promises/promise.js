@@ -327,56 +327,218 @@
 
 // testTry.then().catch((err) => console.log(err));
 
+// /**
+//  * try catch cannot handle the asynchronous code for catching error.
+//  */
+
+// const testTryCatch = () => {
+//     try {
+//         setTimeout(() => {
+//             throw new Error('error');
+//         }, 3000);
+//     }
+//     catch (err) {
+//         console.log(err);
+//     }
+// }
+
+// testTryCatch();
+
+
+// /**************************************************************************************** */
+// /** Asynchronous errors are uncatchable by catch block */
+// /**************************************************************************************** */
+
+
+// /**************************************************************************************** */
+
+// /**
+//  * Promise API
+//  */
+
+// /**
+//  * This is like forkJoin where I want to run
+//  * multiple promises in parallel and wait till 
+//  * all of them are completed. It should be passed
+//  * arrays of promise but simple value can also be passed, they will be resolved as it is.
+//  */
+
+//  const promise1 = new Promise((resolve) => {
+//      resolve('Promise1');
+//  });
+//  const promise2 = new Promise((resolve) => {
+//     resolve('Promise2');
+// });
+// const promise3 = new Promise((resolve,reject) => {
+//     reject('Promise3');
+// });
+
+//  Promise.all([
+//      promise1,
+//      promise2,
+//      promise3
+//  ]).then((data) => console.log(data));
+
+// /**
+//  * Promise.allSettled -> unlike Promise.all which rejects all promises if one failes
+//  * this returns {status:'fulfilled/rejected',value/reason:''} such that other 
+//  * promises which are resolved can be made use of.
+//  *
+//  */
+
+// /**
+//  * Pollyfill of Promise.allSettled
+//  */
+
+// if (!Promise.allSettled) {
+//     Promise.allSettled = (promises) => {
+
+//         const newPromises = promises.map((promise) =>
+//             promise
+//                 .then((data) => {
+//                     return {
+//                         'status': 'fulfilled',
+//                         'value': data
+//                     }
+//                 })
+//                 .catch((error) => {
+
+//                     return {
+//                         'status': 'rejected',
+//                         'reason': error
+//                     }
+
+//                 }
+//                 )
+//         )
+//         return Promise.all(newPromises);
+
+//     }
+//     Promise.allSettled([new Promise((resolve) => resolve(2)), new Promise((resolve, reject) => reject(3))]).then((data) => console.log(data));
+
+// }
+
+// /**
+//  * Promise.race -> like Promise.all but only emits the one which is resolved/rejected first.
+//  * Promise.resolve and Promise.reject -> resolve rejects promise but are seldom used in favour of async await.
+//  */
+
+// const promise = new Promise((resolve, reject) => resolve(2));
+
+// Promise.resolve(promise).then((data) => console.log(data));
+
+
 /**
- * try catch cannot handle the asynchronous code for catching error.
+ * Promisification - It's conversion of a function that takes callbacks into a promise.
+ * It's similar to what I have done in XHR request. Promisifying it.
+ * It's more convenient.
  */
 
-const testTryCatch = () => {
-    try {
-        setTimeout(() => {
-            throw new Error('error');
-        }, 3000);
-    }
-    catch (err) {
-        console.log(err);
-    }
+
+const dummyAsyncFunction = (data, callback) => {
+    if (data)
+        setTimeout(callback(null, 'I am success data'), 2000);
+    else setTimeout((callback('error', 'I am a failed data'), 2000));
 }
 
-testTryCatch();
+
+// dummyAsyncFunction(false, (error, data) => {
+//     if (error) {
+//         console.log(data);
+//     }
+//     else {
+//         console.log('Success: ', data);
+//     }
+// })
+
+/**Promisify dummyAsyncFunction */
 
 
-/**************************************************************************************** */
-/** Asynchronous errors are uncatchable by catch block */
-/**************************************************************************************** */
+promisify = (f) => {
+    return (...args) => {
+        return new Promise((resolve, reject) => {
+            const customCallBack = (error, data) => {
+                if (error) reject(error + ' ' + data);
+                resolve(data);
+            };
+            args.push(customCallBack)
+            console.log(this);
+            f.call(this, ...args);
+        })
+    }
+};
 
 
-/**************************************************************************************** */
+const dummyAsyncPromisified = promisify(dummyAsyncFunction);
+
+dummyAsyncPromisified(true).then((data) => console.log(data)).catch((err) => console.log(err));
+
+
+
+
+
+// function promisify(f) {
+//     return function (...args) { // return a wrapper-function
+//         return new Promise((resolve, reject) => {
+//             function callback(err, result) { // our custom callback for f
+//                 if (err) {
+//                     return reject(err);
+//                 } else {
+//                     resolve(result);
+//                 }
+//             }
+
+//             args.push(callback); // append our custom callback to the end of f arguments
+
+//             f.call(this, ...args); // call the original function
+//         });
+//     };
+// };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 /**
- * Promise API
+ * Good questions on promises:-
+ * 1) Are they same?
+ * promise.then(f1,f2);
+ * promise.then(f1).catch(f2);
+ *
+ *
+ * 2) Is it catchable?
+ * const promise = new Promise((resolve,reject) => {
+ *     setTimout(throw new Error('ok'),1000)
+ * })
+ *
+ * promise.catch((error) => console.log(error));
+ *
+ * 3) Write a pollyfill for Promise.allSettled.
+ *
+ * 4) Write a general promisification method assuming callbacks are of type function(error,result).
+ *
+ *
  */
 
-/**
- * This is like forkJoin where I want to run
- * multiple promises in parallel and wait till 
- * all of them are completed
- */
-
- const promise1 = new Promise((resolve) => {
-     resolve('Promise1');
- });
- const promise2 = new Promise((resolve) => {
-    resolve('Promise2');
-});
-const promise3 = new Promise((resolve,reject) => {
-    reject('Promise3');
-});
-
- Promise.all([
-     promise1,
-     promise2,
-     promise3
- ]).then((data) => console.log(data));
 
 
 
