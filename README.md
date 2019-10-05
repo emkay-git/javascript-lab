@@ -11,3 +11,8 @@ Why it may be better to use libraries like Angular's HttpClient or axion?
 In this lab, I will work on promises, and how to 
 interact with it using then, catch, finally.
 Write some example about Promise Chaining.
+
+
+## Lab3: Blob and File
+### Branch - lab3
+In this lab, I will see how blobs and files are used and treated in Javascript
